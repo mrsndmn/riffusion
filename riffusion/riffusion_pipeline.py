@@ -253,6 +253,8 @@ class RiffusionPipeline(DiffusionPipeline):
         init_image_torch = preprocess_image(init_image).to(
             device=self.device, dtype=embed_start.dtype
         )
+        init_image_torch.unsqueeze_(0)
+
         init_latent_dist = self.vae.encode(init_image_torch).latent_dist
         # TODO(hayk): Probably this seed should just be 0 always? Make it 100% symmetric. The
         # result is so close no matter the seed that it doesn't really add variety.
@@ -453,7 +455,7 @@ def preprocess_image(image: Image.Image) -> torch.Tensor:
         image = image.crop((w_start, 0, w_end, h))
 
     image_np = np.array(image).astype(np.float32) / 255.0
-    image_np = image_np[None].transpose(0, 3, 1, 2)
+    image_np = image_np.transpose(3, 1, 2)
 
     image_torch = torch.from_numpy(image_np)
 
