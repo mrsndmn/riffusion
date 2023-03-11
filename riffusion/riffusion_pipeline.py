@@ -450,7 +450,7 @@ def preprocess_image(image: Image.Image) -> torch.Tensor:
         w_start = random.randint(0, w - max_width)
         w_end = w_start + max_width
 
-        image = image.crop((w_start, h, w_end, 0))
+        image = image.crop((w_start, 0, w_end, h))
 
     image_np = np.array(image).astype(np.float32) / 255.0
     image_np = image_np[None].transpose(0, 3, 1, 2)
