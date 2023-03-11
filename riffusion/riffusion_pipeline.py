@@ -455,7 +455,7 @@ def preprocess_image(image: Image.Image) -> torch.Tensor:
         image = image.crop((w_start, 0, w_end, h))
 
     image_np = np.array(image).astype(np.float32) / 255.0
-    image_np = image_np.transpose(3, 1, 2)
+    image_np = image_np.transpose(2, 0, 1)
 
     image_torch = torch.from_numpy(image_np)
 
