@@ -7,6 +7,7 @@ import dataclasses
 import functools
 import inspect
 import typing as T
+import random
 
 import numpy as np
 import torch
@@ -443,6 +444,13 @@ def preprocess_image(image: Image.Image) -> torch.Tensor:
     w, h = image.size
     w, h = map(lambda x: x - x % 32, (w, h))  # resize to integer multiple of 32
     image = image.resize((w, h), resample=Image.LANCZOS)
+
+    max_width = 512
+    if w > max_width:
+        w_start = random.randint(0, w - max_width)
+        w_end = w_start + max_width
+
+        image = image.crop((w_start, h, w_end, 0))
 
     image_np = np.array(image).astype(np.float32) / 255.0
     image_np = image_np[None].transpose(0, 3, 1, 2)

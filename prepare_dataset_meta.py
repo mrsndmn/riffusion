@@ -23,7 +23,13 @@ args = parser.parse_args()
 dataset = pd.read_csv("../audiocaps/dataset/train.csv")
 
 audio_dir = "../audiocaps_train/"
-spectrogram_dir = '../audiocaps_train_spectrograms/'
+spectrogram_dir = '../audiocaps_train_spectrograms_1k/'
+couny_spectrograms = 1000
+
+if couny_spectrograms > 0:
+    dataset = dataset.head( couny_spectrograms )
+
+
 if not os.path.isdir(spectrogram_dir):
     os.mkdir(spectrogram_dir)
 
