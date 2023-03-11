@@ -45,7 +45,7 @@ from diffusers.training_utils import EMAModel
 from diffusers.utils import check_min_version, deprecate
 from diffusers.utils.import_utils import is_xformers_available
 
-from riffusion.riffusion_pipeline import RiffusionPipeline
+from riffusion.riffusion_pipeline import RiffusionPipeline, preprocess_image
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
 check_min_version("0.15.0.dev0")
@@ -579,7 +579,7 @@ def main():
 
     def preprocess_train(examples):
         # todo apply transforms train augmentations
-        examples["pixel_values"] = [RiffusionPipeline.preprocess_image(image) for image in examples[image_column]]
+        examples["pixel_values"] = [preprocess_image(image) for image in examples[image_column]]
         # examples["pixel_values"] = [train_transforms(image) for image in images]
         examples["input_ids"] = tokenize_captions(examples)
         return examples
