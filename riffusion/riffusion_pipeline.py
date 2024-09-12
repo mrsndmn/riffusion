@@ -7,6 +7,7 @@ import dataclasses
 import functools
 import inspect
 import typing as T
+import random
 
 import numpy as np
 import torch
@@ -160,7 +161,7 @@ class RiffusionPipeline(DiffusionPipeline):
 
             def __init__(self):
                 super().__init__()
-                self.in_channels = device
+                self.in_channels = in_channels
                 self.device = device
                 self.dtype = dtype
 
@@ -252,6 +253,8 @@ class RiffusionPipeline(DiffusionPipeline):
         init_image_torch = preprocess_image(init_image).to(
             device=self.device, dtype=embed_start.dtype
         )
+        init_image_torch.unsqueeze_(0)
+
         init_latent_dist = self.vae.encode(init_image_torch).latent_dist
         # TODO(hayk): Probably this seed should just be 0 always? Make it 100% symmetric. The
         # result is so close no matter the seed that it doesn't really add variety.
@@ -444,8 +447,15 @@ def preprocess_image(image: Image.Image) -> torch.Tensor:
     w, h = map(lambda x: x - x % 32, (w, h))  # resize to integer multiple of 32
     image = image.resize((w, h), resample=Image.LANCZOS)
 
+    max_width = 512
+    if w > max_width:
+        w_start = random.randint(0, w - max_width)
+        w_end = w_start + max_width
+
+        image = image.crop((w_start, 0, w_end, h))
+
     image_np = np.array(image).astype(np.float32) / 255.0
-    image_np = image_np[None].transpose(0, 3, 1, 2)
+    image_np = image_np.transpose(2, 0, 1)
 
     image_torch = torch.from_numpy(image_np)
 
